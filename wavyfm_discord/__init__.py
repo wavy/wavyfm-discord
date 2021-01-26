@@ -1,10 +1,9 @@
+import datetime
 import logging
 import math
-import datetime
 from typing import Union, Optional, Dict
 
 import discord
-import sentry_sdk
 import wavyfm
 from discord.ext import tasks, commands
 from discord.ext.commands import Bot, Cog
@@ -204,18 +203,3 @@ class WavyDiscord(Cog):
             return f"{math.floor(count / 1000)}k"
         else:
             return "{0:.1f}M".format(count / 1000000)
-
-    def run(self, bot_token: str):
-        """Start the bot with the given token (blocking call)"""
-        self.bot.run(bot_token)
-
-
-def init_logging(sentry_url: str = None):
-    """Initialize logger and optional Sentry support"""
-    logging.basicConfig(format='%(asctime)s - %(levelname)s - %(module)s:%(funcName)s:%(lineno)d -- %(message)s',
-                        level=logging.DEBUG)
-    if sentry_url:
-        logging.info("Enabling Sentry support")
-        sentry_sdk.init(sentry_url)
-    else:
-        logging.warning("Sentry support is disabled")
