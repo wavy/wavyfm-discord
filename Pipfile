@@ -1,0 +1,20 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+flake8 = "*"
+
+[packages]
+wavyfm = "==1.0.1"
+"discord.py" = "==1.6.0"
+sentry-sdk = "==0.19.5"
+strict-rfc3339 = "==0.7"
+
+[requires]
+python_version = "3.8"
+
+[scripts]
+lint = "flake8 . --count --show-source --statistics"
+bot = "python -m wavyfm_discord"
