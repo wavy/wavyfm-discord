@@ -57,5 +57,3 @@ See [CONTRIBUTING.md](https://github.com/wavy/wavyfm-discord/blob/master/CONTRIB
 
 This project is licenced under the MIT License.
 
-The overall structure is heavily inspired from [Spotipy](https://github.com/plamere/spotipy), a client library for
-Spotify.
