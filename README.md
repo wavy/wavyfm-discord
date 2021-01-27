@@ -11,7 +11,7 @@
 **A Discord bot for [wavy.fm](https://wavy.fm), officially maintained by Wavy Labs.**
 This bot serves as a showcase for our Python [client library](https://github.com/wavy/wavyfm-python).
 
-![Discord](https://img.shields.io/discord/742178434243100752?color=%237289DA&label=discord)
+ [![Discord](https://img.shields.io/discord/742178434243100752?color=%237289DA&label=discord)](https://wavy.fm/discord)
 
 ## Running the bot
 
