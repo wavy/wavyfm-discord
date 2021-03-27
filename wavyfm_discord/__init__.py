@@ -8,6 +8,8 @@ import wavyfm
 from discord.ext import tasks, commands
 from discord.ext.commands import Bot, Cog
 from discord.utils import escape_markdown
+from requests import ReadTimeout
+from wavyfm.util import datetime_from_string
 
 website_url = "https://wavy.fm"
 default_album_art = "https://i.imgur.com/J1us30b.png"
@@ -19,7 +21,8 @@ class WavyDiscord(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
         self.presence_state = 0
-        self.client = wavyfm.WavyClient(auth_manager=wavyfm.WavyClientCredentials())
+        self.client = wavyfm.WavyClient(auth_manager=wavyfm.WavyClientCredentials(),
+                                        requests_timeout=30)
 
         self.presence_task.start()
 
@@ -56,7 +59,7 @@ class WavyDiscord(Cog):
             else:
                 last_played = self.client.users.by_uri(profile["uri"]).get_recent_listens(1)["items"]
                 last_played = last_played[0] if len(last_played) else None
-                date = datetime.datetime.fromisoformat(last_played["date"].replace('Z', '+00:00'))
+                date = datetime_from_string(last_played["date"])
                 if last_played:
                     await ctx.send(embed=self.create_listen_embed(profile, last_played, date))
                 else:
@@ -64,6 +67,9 @@ class WavyDiscord(Cog):
         except wavyfm.WavyException:
             logging.error("Error while getting currently listening", exc_info=True)
             await ctx.reply("Sorry, an internal error occurred. Please try again later.")
+        except ReadTimeout:
+            logging.error("Timeout while getting currently listening", exc_info=True)
+            await ctx.reply("Sorry, this command took too long to execute. Please try again later.")
 
     @commands.command("profile", brief="Prints the wavy.fm profile of the given user (or yourself)")
     async def profile_command(self, ctx: commands.Context, user: Union[discord.User, str] = None):
@@ -95,8 +101,11 @@ class WavyDiscord(Cog):
 
             await ctx.send(embed=embed)
         except wavyfm.WavyException:
-            logging.error("Error while getting currently listening", exc_info=True)
+            logging.error("Error while getting profile", exc_info=True)
             await ctx.reply("Sorry, an internal error occurred. Please try again later.")
+        except ReadTimeout:
+            logging.error("Timeout while getting profile", exc_info=True)
+            await ctx.reply("Sorry, this command took too long to execute. Please try again later.")
 
     @commands.command("top", brief="Prints the top wavy.fm users by listen count")
     async def top_command(self, ctx: commands.Context):
@@ -123,8 +132,11 @@ class WavyDiscord(Cog):
 
             await ctx.send(embed=embed)
         except wavyfm.WavyException:
-            logging.error("Error while getting currently listening", exc_info=True)
+            logging.error("Error while getting leaderboard", exc_info=True)
             await ctx.reply("Sorry, an internal error occurred. Please try again later.")
+        except ReadTimeout:
+            logging.error("Timeout while getting leaderboard", exc_info=True)
+            await ctx.reply("Sorry, this command took too long to execute. Please try again later.")
 
     @presence_task.before_loop
     async def wait_for_bot(self):
@@ -148,6 +160,9 @@ class WavyDiscord(Cog):
             else:
                 logging.error("Error while getting profile", exc_info=True)
                 await ctx.reply("Sorry, an internal error occurred. Please try again later.")
+        except ReadTimeout:
+            logging.error("Timeout while getting profile", exc_info=True)
+            await ctx.reply("Sorry, this command took too long to execute. Please try again later.")
 
     @staticmethod
     def create_listen_embed(profile: Dict, item: Dict, date: datetime.datetime = None) -> discord.Embed:
